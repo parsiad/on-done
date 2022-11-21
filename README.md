@@ -1,19 +1,23 @@
-# on-done
+<p align="center">
+  <img alt="on-done" src="https://raw.githubusercontent.com/parsiad/on-done/master/logo.png">
+</p>
 
-on-done is an IPython/Jupyter cell magic to execute code after a cell succeeds or fails.
-It is especially useful if you need a way to alert yourself that your code has terminated.
+An IPython/Jupyter cell magic to execute code after a cell succeeds or fails so you can receive an alert when your code terminates.
 
-It is inspired by [this Stack Overflow answer](https://stackoverflow.com/a/57365710) by [Colin Carroll](https://stackoverflow.com/a/57365710).
+![](https://github.com/parsiad/on-done/blob/main/tty.gif?raw=true)
 
-## Example Usage
+## Installation
+
+```console
+$ pip install on-done
+```
+
+## Example
 
 Start by launching an IPython session:
 
 ```console
 $ ipython
-Python 3.10.5 (main, Jun  6 2022, 18:49:26) [GCC 12.1.0]
-Type 'copyright', 'credits' or 'license' for more information
-IPython 8.4.0 -- An enhanced Interactive Python. Type '?' for help.
 ```
 
 Then, load the extension:
@@ -25,22 +29,38 @@ In [1]: %load_ext on_done
 Next, define a function to alert you that your code has terminated.
 
 ```python
-In [2]: from datetime import datetime
-   ...: import sys
-   ...:
-   ...: def alert():
-   ...:     sys.stderr.write(f'Cell terminated at {str(datetime.now())}\n')
+In [2]: def alert():
+   ...:     from datetime import datetime
+   ...:     print(f"Cell terminated at {str(datetime.now())}\n")
 ```
 
-Note that in the above, a message is written to stderr.
-You may instead want to send yourself an email, text message, Slack alert, etc.
+**You can change this function to send yourself an email, Slack alert, etc.**
 
-Let's test it:
+Putting `%%on_done alert()` at the top of a cell will cause it to alert:
 
 ```python
 In [3]: %%on_done alert()
    ...: import numpy as np
-   ...:
-   ...: np.random.randn(10**8)
-Cell terminated at 2022-07-20 13:31:45.690233
+   ...: x = np.random.randn(10**8)
+   ...: print(f"mean={x.mean()}")
+mean=0.00021783589122321365
+Cell terminated at 2022-11-21 00:35:40.678180
 ```
+
+In particular, the alert will also occur if the cell failed:
+
+```python
+In [4]: %%on_done alert()
+   ...: import numpy as np
+   ...: x = np.random.randn(10**8)
+   ...: print(f"mean={x.mean(axis=1)}")
+Cell terminated at 2022-11-21 00:35:50.654766
+
+---------------------------------------------------------------------------
+AxisError                                 Traceback (most recent call last)
+...
+```
+
+## Credit
+
+on-done is inspired by [this Stack Overflow answer](https://stackoverflow.com/a/57365710) by [Colin Carroll](https://colindcarroll.com)
